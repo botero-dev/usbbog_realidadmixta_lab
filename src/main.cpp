@@ -2,20 +2,26 @@
 
 // Select output mode by uncommenting one of the following
 
-// Basic text output in format A0 B1 C0 D1 X234 Y221
-// #define SEND_STATE_TEXT
+
+// FUNCIONANDO OK
 
 // Text format compatible with teleplot. each variable is written as `>VAR:VALUE\n` 
-#define SEND_STATE_DEBUG
+//#define SEND_STATE_DEBUG
+
+// Communicates inputs as USB HID device.
+#define SEND_STATE_USB
+
+
+// NO IMPLEMENTADOS TODAVIA
+
+// Basic text output in format A0 B1 C0 D1 X234 Y221
+// #define SEND_STATE_TEXT
 
 // Compact serialization format. consists on a header and raw bytes of data.
 // #define SEND_STATE_BINARY
 
 // Writes data into JSON objects. Delimits each message with `\n`
 // #define SEND_STATE_JSON
-
-// Communicates inputs as USB HID device.
-//#define SEND_STATE_USB
 
 
 #include <Arduino.h>
@@ -265,8 +271,11 @@ void loop() {
 			break;
 		}
 	}
+
+	// for testing, maybe remove in the future
 	is_dirty = true;
 
+	
 	if (is_dirty) {
 #ifdef SEND_STATE_BINARY
 		send_state_binary(state);
@@ -400,6 +409,10 @@ void send_state_usb(State* state) {
 
 	report.x = clamp_axis(NUM_ANALOG > 0 ? state->axes[0] : 512);
 	report.y = clamp_axis(NUM_ANALOG > 1 ? state->axes[1] : 512);
+
+	// stick is flipped, so we flip values
+	report.x = 1023 - report.x;
+	report.y = 1023 - report.y;
 
 	HID().SendReport(GAMEPAD_REPORT_ID, &report, sizeof(report));
 }

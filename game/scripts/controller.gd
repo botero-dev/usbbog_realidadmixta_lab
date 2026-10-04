@@ -1,6 +1,5 @@
 extends Node
 
-@onready var serial_gamepad: Node = $"../SerialGamepad"
 
 
 var input_left: float = 0
@@ -8,10 +7,14 @@ var input_right: float = 0
 var input_up: float = 0
 var input_down: float = 0
 
+@onready var serial_gamepad: Node = $"../SerialGamepad"
 @onready var ship: Ship = $"../Ship"
 
 func _ready() -> void:
 	serial_gamepad.input_received.connect(on_input_received)
+
+func _input(event: InputEvent) -> void:
+	on_input_received(event)
 
 func on_input_received(evt: InputEvent):
 	if evt.is_action("move_right"):

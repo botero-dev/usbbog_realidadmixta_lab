@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://dqewd7gryflly"]
+
+[ext_resource type="Script" uid="uid://spl3yapk12qu" path="res://scripts/serial_gamepad.gd" id="1_j5px3"]
+[ext_resource type="Script" uid="uid://wbx1ouaqp4hg" path="res://scripts/controller.gd" id="2_twpsu"]
+
+[node name="Game" type="Node" unique_id=488194570]
+
+[node name="SerialGamepad" type="Node" parent="." unique_id=1742185797]
+script = ExtResource("1_j5px3")
+report_format = 1
+
+[node name="Controller" type="Node" parent="." unique_id=95660251]
+script = ExtResource("2_twpsu")

@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://b6c3q7shb5vhv"]
+
+[ext_resource type="Script" uid="uid://c7urmowkk4g3x" path="res://scripts/ship.gd" id="1_2gnfn"]
+[ext_resource type="Texture2D" uid="uid://dex1ckhbv6xj1" path="res://textures/Ships/Spaceship_0.png" id="2_4tobq"]
+[ext_resource type="PackedScene" uid="uid://drsyn6ua8qsh" path="res://scenes/projectile.tscn" id="2_tfsc7"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_8m247"]
+
+[node name="Ship" type="CharacterBody2D" unique_id=1619261381]
+collision_layer = 2
+script = ExtResource("1_2gnfn")
+projectile_template = ExtResource("2_tfsc7")
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=721373689]
+shape = SubResource("CircleShape2D_8m247")
+
+[node name="Spaceship0" type="Sprite2D" parent="." unique_id=1922505054]
+rotation = 1.5707964
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("2_4tobq")

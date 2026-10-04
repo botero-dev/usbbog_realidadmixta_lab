@@ -8,6 +8,7 @@ var input_right: float = 0
 var input_up: float = 0
 var input_down: float = 0
 
+@onready var ship: Ship = $"../Ship"
 
 func _ready() -> void:
 	serial_gamepad.input_received.connect(on_input_received)
@@ -23,17 +24,21 @@ func on_input_received(evt: InputEvent):
 		input_down = evt.get_action_strength("move_down")
 	
 	if evt.is_action_pressed("fire"):
+		if ship:
+			ship.fire()
 		
-		print("fire!")
 	if evt.is_action_pressed("boost"):
-		print("boost!")
+		if ship:
+			ship.boost()
+		
 	if evt.is_action_pressed("spin"):
-		print("spin!")
+		if ship:
+			ship.spin()
 	
 	
-func _process(delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	var move_horizontal := input_right - input_left
-	#print("Horizontal: ", move_horizontal)
+	var move_vertical := input_down - input_up
 	
-	var move_vertical := input_up - input_down
-	#print("Vertical: ", move_vertical)
+	if ship:
+		ship.steer(Vector2(move_horizontal, move_vertical))

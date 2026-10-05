@@ -281,7 +281,16 @@ No obstante, esta conclusión está acotada al escenario del laboratorio. Si en 
 
 
 \section{Conclusión}
-En este trabajo se presentó ..., se analizaron ..., y se demostró que .... Los resultados obtenidos permiten concluir que ..., lo cual abre la posibilidad de trabajos futuros relacionados con ....
+
+El objetivo general de este laboratorio era implementar y evaluar una experiencia físico-digital basada en la comunicación entre un microcontrolador Arduino Pro Micro y un entorno interactivo en Godot. Los resultados obtenidos permiten afirmar que dicho objetivo se cumplió: el controlador físico y el simulador se comunicaron de manera estable y el usuario pudo interactuar con la experiencia de forma fluida.
+
+Cada objetivo específico planteado al inicio encontró también su cierre en el desarrollo del trabajo. Se diseñó y construyó el circuito con el Arduino Pro Micro, el joystick analógico y los pulsadores (Figura~\ref{fig:montaje}), logrando la captura correcta de las señales analógicas y digitales. Sobre esa base se investigaron y aplicaron los fundamentos de la comunicación USB nativa (HID) y de los protocolos seriales ligeros como Teleplot, lo que dio lugar a tres implementaciones ---Teleplot, USB HID y JSON--- comparadas bajo las mismas condiciones. Cada una de ellas se integró con el simulador asignado, Piloto de nave/dron, validando su funcionamiento en tiempo real, y finalmente se analizó su desempeño en términos de tamaño de paquete, eficiencia del bus y tolerancia a fallos mediante la validación del formato.
+
+El análisis de esas tres alternativas nos demuestra que la mejor herramienta depende siempre del problema que queramos solucionar, y no de una preferencia técnica fija. Para el caso estudiado ---un dispositivo dedicado únicamente a capturar las entradas del usuario--- USB HID resultó la opción más conveniente, gracias a su integración automática con el sistema operativo y el motor, que evita el trabajo de análisis y validación en la aplicación. En cambio, si el sistema requiriera transmitir información más variada o con formato cambiante, la flexibilidad de un protocolo serial como Teleplot o JSON sería preferible.
+
+En síntesis, lo verdaderamente importante no es memorizar un protocolo específico, sino conocer las herramientas disponibles y comprender sus ventajas y limitaciones para poder tomar una decisión informada según los requisitos de cada proyecto. Ese criterio, aprendido a lo largo de esta exploración, será el que guíe la selección de la tecnología de comunicación en las siguientes etapas del curso.
+
+
 
 
 

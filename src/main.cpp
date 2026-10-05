@@ -6,7 +6,7 @@
 // FUNCIONANDO OK
 
 // Text format compatible with teleplot. each variable is written as `>VAR:VALUE\n` 
-// #define SEND_STATE_DEBUG
+//#define SEND_STATE_DEBUG
 
 // Communicates inputs as USB HID device.
 #define SEND_STATE_USB
@@ -23,6 +23,16 @@
 // Compact serialization format. consists on a header and raw bytes of data.
 // #define SEND_STATE_BINARY
 
+
+// Tasa de envio fija (ms entre muestras). Descomentar para comparar los
+// protocolos en igualdad de condiciones; si queda comentado, se envia en cada
+// vuelta del loop (la tasa la fija la velocidad del bucle).
+//#define SEND_EVERY_MS 5
+
+// Latido de medicion para USB HID: alterna un boton no usado en cada reporte
+// para que el kernel entregue todos (los reportes identicos pueden no generar
+// evento). Solo para medir; no afecta a los 4 botones del juego.
+#define HID_HEARTBEAT
 
 #include <Arduino.h>
 
@@ -252,7 +262,6 @@ void loop() {
 	discard_serial_input();
 
 	State* state = &states[frame % NUM_STATES]; 
-	state->timestamp = micros();
 	// Entradas digitales -> "d5", "d6", "d7", "d9" ...
 	for (uint8_t i = 0; i < NUM_DIGITAL; i++) {
 		bool value = !digitalRead(DIGITAL_PINS[i]); // flipped condition because pin is default_pullup
@@ -284,27 +293,22 @@ void loop() {
 	}
 
 
-	bool is_dirty = false;
-
-	for (uint8_t i = 0; i < NUM_DIGITAL; i++) {
-		if (state->btns[i] != old_state->btns[i]) {
-			is_dirty = true;
-			break;
-		}
+	// Condicion de envio. Sin SEND_EVERY_MS se envia en cada vuelta del loop
+	// (la tasa la fija el bucle). Con SEND_EVERY_MS se envia a una tasa fija.
+#ifdef SEND_EVERY_MS
+	static unsigned long lastSendMs = 0;
+	unsigned long nowMs = millis();
+	bool due = (nowMs - lastSendMs) >= SEND_EVERY_MS;
+	if (due) {
+		lastSendMs = nowMs;
 	}
+#else
+	bool due = true;
+#endif
 
-	for (uint8_t i = 0; i < NUM_ANALOG; i++) {
-		if (state->axes[i] != old_state->axes[i]) {
-			is_dirty = true;
-			break;
-		}
-	}
-
-	// for testing, maybe remove in the future
-	is_dirty = true;
-
-
-	if (is_dirty) {
+	if (due) {
+		// Marca de tiempo tomada en el instante del envio (para medir la cadencia).
+		state->timestamp = micros();
 #ifdef SEND_STATE_BINARY
 		send_state_binary(state);
 #elif defined(SEND_STATE_TEXT)
@@ -352,6 +356,7 @@ void loop() {
 #define HID_BTN_EAST   1    // Button 2
 #define HID_BTN_NORTH  3    // Button 4
 #define HID_BTN_THUMBL 13   // Button 14
+#define HID_BTN_HEARTBEAT 4 // Button 5 (no usado; solo con HID_HEARTBEAT)
 
 // Correspondencia pin -> bit HID, en el orden de DIGITAL_PINS[].
 static const uint8_t USB_BUTTON_BITS[NUM_DIGITAL] = {
@@ -441,6 +446,16 @@ void send_state_usb(State* state) {
 	// stick is flipped, so we flip values
 	report.x = 1023 - report.x;
 	report.y = 1023 - report.y;
+
+#ifdef HID_HEARTBEAT
+	// Alterna un boton no usado para que cada reporte cambie y el kernel los
+	// entregue todos (util para medir el ritmo real de reportes).
+	static bool hb = false;
+	hb = !hb;
+	if (hb) {
+		report.buttons |= (uint16_t)(1u << HID_BTN_HEARTBEAT);
+	}
+#endif
 
 	HID().SendReport(GAMEPAD_REPORT_ID, &report, sizeof(report));
 }

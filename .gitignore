@@ -19,3 +19,8 @@
 *.synctex.gz
 *.toc
 *.xdv
+
+# Artefactos de ejecucion de los scripts de medicion
+__pycache__/
+*.pyc
+logs/

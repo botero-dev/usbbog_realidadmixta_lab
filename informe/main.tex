@@ -51,12 +51,12 @@ La utilización de USB como medio de comunicación permite simplificar la integr
 \section{Objetivos}
 
 \subsection{Objetivo general}
-Implementar y evaluar una experiencia físico-digital basada en la comunicación entre un microcontrolador Arduino Pro Micro y un entorno interactivo en Godot, utilizando los protocolos USB HID y Teleprot para analizar el flujo de información y el control en tiempo real de un simulador de vuelo.
+Implementar y evaluar una experiencia físico-digital basada en la comunicación entre un microcontrolador Arduino Pro Micro y un entorno interactivo en Godot.
 
 \subsection{Objetivos específicos}
 \begin{itemize}
     \item Diseñar y construir un circuito físico basado en un microcontrolador Arduino Pro Micro, un joystick analógico y tres pulsadores para la captura de señales análogas y digitales.
-    \item Investigar y aplicar los fundamentos técnicos de la comunicación USB nativa (HID) y protocolos seriales ligeros como Teleprot para la transmisión de comandos hacia entornos virtuales.
+    \item Investigar y aplicar los fundamentos técnicos de la comunicación USB nativa (HID) y protocolos seriales ligeros como Teleplot para la transmisión de comandos hacia entornos virtuales.
     \item Desarrollar la integración de las señales físicas con el simulador interactivo “Piloto de nave/dron” en Godot Engine, validando el comportamiento operativo bajo condiciones reales.
     \item Analizar el rendimiento de la comunicación en términos de tamaño de paquete, eficiencia del bus y estrategias de tolerancia a fallos mediante validación de formato.
 \end{itemize}
@@ -146,7 +146,9 @@ Para comunicar nuestros sensores físicos con Godot implementamos varios protoco
     Adicionalmente, durante una de estas pruebas notamos una conección cruzada entre las señales de los botones y los potenciometros. Este fallo se mostraba como un bajón en las lecturas de los potenciometros cuando un botón estaba presionado. Esta validación nos llevo a retrabajar la placa antes de continuar con el desarrollo del proyecto.
 
 
-    \item \textbf{USB HID (Human Interface Device):} Se configuró directamente en el firmware del Arduino Pro Micro para que el microcontrolador se comporte como un periférico de juego estándar. Mediante este mecanismo, el controlador físico puede transmitir las entradas del joystick y los botones como eventos de un dispositivo HID. El firmware define un reporte de tipo gamepad, con campos para los botones y los ejes X y Y, permitiendo que el sistema operativo y el entorno de desarrollo reconozcan el dispositivo como un controlador de entrada. Enlos reportes que se envían, se usa byte stuffing, ya que el dispositivo declara soportar todos los botones de un gamepad durante la enumeración, aunque solamente usa unos bits específicos para los tres botones de nuestro dispositivo. Los botones son reportados como los botones (face down, face right, face up, left thumbstick) \cite{arduino2024,usbhid}.
+    \item \textbf{USB HID (Human Interface Device):} Se configuró directamente en el firmware del Arduino Pro Micro para que el microcontrolador se comporte como un periférico de juego estándar. Mediante este mecanismo, el controlador físico puede transmitir las entradas del joystick y los botones como eventos de un dispositivo HID. El firmware define un reporte de tipo gamepad, con campos para los botones y los ejes X y Y, permitiendo que el sistema operativo y el entorno de desarrollo reconozcan el dispositivo como un controlador de entrada.
+    
+    En los reportes que se envían, el dispositivo declara soportar todos los botones de un gamepad durante la enumeración, aunque solamente usa unos bits específicos para los tres botones de nuestro dispositivo. Los botones son reportados como los botones (face down, face right, face up, left thumbstick) \cite{arduino2024,usbhid}.
     
     Este enfoque simplifica la integración con Godot, ya que las acciones del usuario se pueden interpretar como acciones de cualquier control de juegos.
 
@@ -172,8 +174,7 @@ Ya que todos los caminos del codigo se unifican al final, y reciben eventos con 
 
 \subsection{Desarrollo e integración de la experiencia interactiva}
 
-/// copiado de arriba, toca arreglar:
- controlador pueden asociarse mediante el sistema de entradas (\textit{Input Map}) evitando depender exclusivamente de la interpretación de cadenas de texto para el funcionamiento de la interacción..
+
 
 Como entorno de simulación interactiva se nos asignó el escenario \textbf{Piloto de nave/dron}, el cual exige un control continuo de la altitud y aceleración mediante los ejes del joystick, complementado por los pulsadores para funciones de disparo, impulso y alternancia de modos. 
 

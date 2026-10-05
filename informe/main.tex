@@ -43,7 +43,7 @@ Piloto de nave/dron }
 
 % The paper headers
 \markboth{Universidad de San Buenaventura - Ingeniería Multimedia }%
-{Shell \MakeLowercase{\textit{Apellido, Nombre}}: Laboratorio Experiencia Físico-Digital, Piloto de nave/dron}
+{\textit{Botero et al.}: Laboratorio Experiencia Físico-Digital}
 % The only time the second header will appear is for the odd numbered pages
 % after the title page when using the twoside option.
 
@@ -125,11 +125,11 @@ JSON (JavaScript Object Notation) se ha consolidado como un estándar universal 
 
 
 \subsection{Métodos de Comprobación de Integridad de Datos}
-Dado que los canales de comunicación serial están frecuentemente expuestos a ruidos eléctricos e interferencias electromagnéticas, es indispensable implementar métodos matemáticos que permitan al receptor validar si los bytes transferidos sufrieron alteraciones durante el recorrido \cite{tanenbaum2012}:
+Dado que los canales de comunicación serial están frecuentemente expuestos al ruido eléctrico y a las interferencias electromagnéticas, es indispensable implementar métodos matemáticos que permitan al receptor validar si los bytes transferidos sufrieron alteraciones durante el recorrido \cite{tanenbaum2012}:
 \begin{itemize}
     \item \textbf{Bit de paridad:} Representa el mecanismo de verificación más rudimentario. Se basa en concatenar un bit redundante al final de la palabra de datos con el objetivo de forzar que el conteo total de unos lógicos (1) sea par o impar. Si bien su costo computacional es prácticamente inexistente en microcontroladores, su nivel de robustez es deficiente; este método falla sistemáticamente ante ráfagas de error, ya que no puede alertar anomalías si un número par de bits cambia de estado de manera simultánea \cite{stallings2004}.
     
-    \item \textbf{Checksum (Suma de comprobación módulo 256 y XOR):} Involucra ejecutar operaciones algebraicas elementales sobre el paquete. Por ejemplo, consiste en realizar la suma (descartando el desbordamiento de 8 bits) de todos los bytes del mensaje, o aplicar la compuerta lógica XOR de forma acumulativa sobre la secuencia, anexando el resultado como firma final de la trama. El dispositivo receptor repite el cálculo para corroborar las firmas. Estas técnicas consumen recursos computacionales muy bajos, haciéndolas ideales para el hardware embebido \cite{stallings2004}. Su robustez es considerada de nivel medio, ya que en algunos casos puede fallar cuando la corrupción de datos sigue algunos patrones específicos.\cite{tanenbaum2012}.
+    \item \textbf{Checksum (Suma de comprobación módulo 256 y XOR):} Involucra ejecutar operaciones algebraicas elementales sobre el paquete. Por ejemplo, consiste en realizar la suma (descartando el desbordamiento de 8 bits) de todos los bytes del mensaje, o aplicar la compuerta lógica XOR de forma acumulativa sobre la secuencia, anexando el resultado como firma final de la trama. El dispositivo receptor repite el cálculo para corroborar las firmas. Estas técnicas consumen recursos computacionales muy bajos, haciéndolas ideales para el hardware embebido \cite{stallings2004}. Su robustez es considerada de nivel medio, ya que en algunos casos puede fallar cuando la corrupción de datos sigue algunos patrones específicos \cite{tanenbaum2012}.
     
     \item \textbf{CRC (Comprobación de Redundancia Cíclica):} Es un enfoque polinomial que ofrece alta precisión. Analiza la totalidad del bloque de bits asumiendo que es un coeficiente polinómico gigante, el cual se divide iterativamente (mediante aritmética XOR) por una constante matemática conocida como polinomio generador; el residuo resultante de esta división se adjunta al mensaje \cite{tanenbaum2012}. El CRC destaca por una robustez excepcional, logrando detectar alteraciones de ráfagas largas e inversiones complejas que el \textit{checksum} omitiría \cite{stallings2004}. La desventaja de este algoritmo es su costo computacional, el cual es el más alto entre las opciones. En general requiere de optimizaciones específicas para que no sea el cuello de botella en la ejecución del firmware \cite{tanenbaum2012}.
 \end{itemize}
@@ -143,7 +143,7 @@ Los protocolos de enlace definen la forma en que los bits son transmitidos a tra
     \item \textbf{USB (\textit{Universal Serial Bus}):} A diferencia de UART, USB es un bus \textbf{centralizado y sondeado} (\textit{polled}): existe un único anfitrión (\textit{host}) que administra el medio, al cual se conectan todos los dispositivos. Al conectar un dispositivo, el anfitrión ejecuta un proceso de \textbf{enumeración} en el que le asigna una dirección y le pregunta cuáles son sus capacidades. El dispositivo responde con una \textbf{tabla de descriptores}, es decir, tablas que le indican al anfitrión qué datos puede emitir y con qué estructura lo hace \cite{usbhid}.
 \end{itemize}
 
-\textbf{La ventaja del Arduino Pro Micro:} Esta placa integra la función USB en su propio microcontrolador (ATmega32U4). Esto significa que el chip principal expone directamente la comunicación serial como una de sus capacidades USB, sin necesidad de un chip adicional. Además, permite programar el dispositivo para exponer otras capacidades USB, como HID (mouse, teclado o control de juego). De esta manera es posible usar la misma coneccion para transportar tanto la comunicación serial como las entradas del controlador \cite{arduino2024}.
+\textbf{La ventaja del Arduino Pro Micro:} Esta placa integra la función USB en su propio microcontrolador (ATmega32U4). Esto significa que el chip principal expone directamente la comunicación serial como una de sus capacidades USB, sin necesidad de un chip adicional. Además, permite programar el dispositivo para exponer otras capacidades USB, como HID (mouse, teclado o control de juego). De esta manera es posible usar la misma conexión para transportar tanto la comunicación serial como las entradas del controlador \cite{arduino2024}.
 
 \subsection{Estructura de los Paquetes USB HID}
 A diferencia de los protocolos de texto, que delimitan cada mensaje de forma explícita, el perfil \textbf{HID} (\textit{Human Interface Device}) de USB describe sus datos una sola vez y luego los envía siempre con el mismo formato \cite{usbhid}. Esa descripción se realiza mediante el \textbf{descriptor de reporte} (\textit{Report Descriptor}), que funciona como una cabecera: primero establece un identificador (\texttt{Report ID}) y enseguida describe qué datos van a llegar y con qué formato (por ejemplo, cuántos bits ocupa cada campo). Esta cabecera se declara durante la enumeración y no se repite en cada mensaje.
@@ -153,7 +153,7 @@ Así, cada \textbf{paquete de reporte} (\textit{Input Report}) es simplemente la
 \section{Metodología y Desarrollo}
 
 \subsection{Descripción del Montaje Físico y Hardware}
-El desarrollo de el mecanismo físico-digital se implementó con un microcontrolador \textbf{Arduino Pro Micro}. La elección del Arduino Pro Micro se fundamenta en su capacidad nativa de emulación de dispositivos USB HID, lo que simplifica la transmisión de datos hacia el entorno digital.
+El desarrollo del mecanismo físico-digital se implementó con un microcontrolador \textbf{Arduino Pro Micro}. La elección del Arduino Pro Micro se fundamenta en su capacidad nativa de emulación de dispositivos USB HID, lo que simplifica la transmisión de datos hacia el entorno digital.
 
 
 El control construido consta de una palanca de dos ejes (\texttt{X} e \texttt{Y}), que se comporta como dos potenciómetros independientes, y tres pulsadores (\texttt{A}, \texttt{B} y \texttt{C}). Además, la propia palanca incorpora un cuarto pulsador (\texttt{D}) que se activa al presionarla hacia abajo. Los ejes entregan valores analógicos en un rango de 0 a 1023, mientras que los pulsadores entregan valores digitales. El montaje se hizo con soldadura sobre una placa perforada para asegurar la estabilidad de las conexiones, como se muestra en la Figura~\ref{fig:montaje}.
@@ -172,12 +172,12 @@ El control construido consta de una palanca de dos ejes (\texttt{X} e \texttt{Y}
 
 Para comunicar nuestros sensores físicos con Godot implementamos varios protocolos de comunicación. Algunos usan el puerto serial, y otros usan la interfaz USB HID.
 
-Conviene aclarar la intención detrás de estas elecciones. No nos limitamos a una lista cerrada de opciones: adoptamos \textbf{Teleplot} como una alternativa conveniente que encontramos para poner a prueba el circuito de forma rápida y sencilla, y que así mismo resulta útil para depurar el producto final. USB HID y JSON se sumaron después como representantes de un bus nativo del hardware y de un formato de intercambio estándar, respectivamente, para poder comparar enfoques distintos.
+Conviene aclarar la intención detrás de estas elecciones. No nos limitamos a una lista cerrada de opciones: adoptamos \textbf{Teleplot} como una alternativa conveniente que encontramos para poner a prueba el circuito de forma rápida y sencilla, y que asimismo resulta útil para depurar el producto final. USB HID y JSON se sumaron después como representantes de un bus nativo del hardware y de un formato de intercambio estándar, respectivamente, para poder comparar enfoques distintos.
 
 \begin{itemize}
     \item \textbf{Variables Estructuradas:} En principio usamos el protocolo que usa \textbf{Teleplot} para validar el circuito de manera fácil antes de implementar cualquier cosa en Godot. Este protocolo está orientado a la transmisión estructurada de paquetes de telemetría y comandos de control a través del puerto serial.
 
-    En el código generamos mensajes en formato ASCII usando los identificadores A, B, C y D para los botones, y los identificadores X, Y para los ejes analógicos. Se emite un mensaje por cada boton o sensor, y mensajes siguen un formato del tipo \texttt{>VARIABLE:VALOR}, y usando un salto de línea como delimitador entre los mensajes.
+    En el código generamos mensajes en formato ASCII usando los identificadores A, B, C y D para los botones, y los identificadores X, Y para los ejes analógicos. Se emite un mensaje por cada botón o sensor, y los mensajes siguen un formato del tipo \texttt{>VARIABLE:VALOR}, usando un salto de línea como delimitador entre ellos.
     
     Este protocolo nos permite visualizar gráficamente la variación de las entradas durante la manipulación del controlador físico usando el plugin de Teleplot en Visual Studio Code, como se muestra en la Figura~\ref{fig:teleplot}. De esta manera pudimos validar la correcta instalación del circuito antes de proceder con la implementación de los otros protocolos.
 
@@ -188,12 +188,12 @@ Conviene aclarar la intención detrás de estas elecciones. No nos limitamos a u
         \label{fig:teleplot}
     \end{figure}
 
-    Adicionalmente, durante una de estas pruebas notamos una conección cruzada entre las señales de los botones y los potenciometros. Este fallo se mostraba como un bajón en las lecturas de los potenciometros cuando un botón estaba presionado. Esta validación nos llevo a retrabajar la placa antes de continuar con el desarrollo del proyecto.
+    Adicionalmente, durante una de estas pruebas notamos una conexión cruzada entre las señales de los botones y los potenciómetros. Este fallo se manifestaba como una caída en las lecturas de los potenciómetros cuando un botón estaba presionado. Esta validación nos llevó a retrabajar la placa antes de continuar con el desarrollo del proyecto.
 
 
     \item \textbf{USB HID (Human Interface Device):} Se configuró directamente en el firmware del Arduino Pro Micro para que el microcontrolador se comporte como un periférico de juego estándar. Mediante este mecanismo, el controlador físico puede transmitir las entradas del joystick y los botones como eventos de un dispositivo HID. El firmware define un reporte de tipo gamepad, con campos para los botones y los ejes X y Y, permitiendo que el sistema operativo y el entorno de desarrollo reconozcan el dispositivo como un controlador de entrada.
     
-    En los reportes que se envían, el dispositivo declara soportar todos los botones de un gamepad durante la enumeración, aunque solamente usa unos bits específicos para los tres botones de nuestro dispositivo. Los botones son reportados como los botones (face down, face right, face up, left thumbstick) \cite{arduino2024,usbhid}.
+    En los reportes que se envían, el dispositivo declara soportar todos los botones de un gamepad durante la enumeración, aunque solamente usa unos bits específicos para los cuatro pulsadores del dispositivo. Estos se reportan con los usos (face down, face right, face up, left thumbstick) \cite{arduino2024,usbhid}.
     
     Este enfoque simplifica la integración con Godot, ya que las acciones del usuario se pueden interpretar como acciones de cualquier control de juegos.
 
@@ -228,15 +228,15 @@ Event: time 1791164629.008966, type 1 (EV_KEY), code 305 (BTN_EAST), value 1
 
 El desarrollo del software interactivo se implementó en \textbf{Godot Engine}, empleando su arquitectura de nodos y scripts en GDScript para gestionar la simulación de los cuerpos físicos. El taller sugería Unity como motor; sin embargo, tomamos la libertad de usar Godot, un motor de código abierto con el que el grupo ya estaba familiarizado. Esta decisión no afecta el objeto de estudio, ya que la comparación entre protocolos de comunicación es independiente del motor gráfico empleado. Todo el código fuente del sistema, incluyendo los scripts de control y la estructura del proyecto, se encuentra disponible en el repositorio oficial del grupo \cite{botero2026repo}.
 
-Para los protocolos que usaban comunicacion serial directamente, usamos el plugin externo GdSerial para leer el dispositivo serial \cite{gdserial2026}. Dentro del proyecto se puede configurar si el formato de los mensajes es el de Teleplot (lo llamamos DEBUG) o si es formato JSON. De esta manera el código elige que camino tomar al momento de interpretar los mensajes.
+Para los protocolos que usaban comunicación serial directamente, usamos el plugin externo GdSerial para leer el dispositivo serial \cite{gdserial2026}. Dentro del proyecto se puede configurar si el formato de los mensajes es el de Teleplot (lo llamamos DEBUG) o si es formato JSON. De esta manera, el código elige qué camino tomar al momento de interpretar los mensajes.
 
-Para cualquiera de los casos, sea formato Teleplot o JSON, el código genera la misma señal de \texttt{input\_received} a la cual otros sistemas del motor pueden conectarse para reaccionar a los eventos recibidos del Arduino. Adicionalmente, esta señal emite datos tipo \texttt{InputEvent} similar a como hace Godot con sus eventos nativos, lo que permite manejarlos de manera amigable.
+Para cualquiera de los casos, sea formato Teleplot o JSON, el código genera la misma señal de \texttt{input\_received} a la cual otros sistemas del motor pueden conectarse para reaccionar a los eventos recibidos del Arduino. Adicionalmente, esta señal emite datos de tipo \texttt{InputEvent}, similar a como hace Godot con sus eventos nativos, lo que permite manejarlos de forma sencilla.
 
-En el caso de USB HID, no hacía falta escribir codigo adicional para el manejo de la comunicación, ya que todos los eventos son capturados automáticamente por el motor, y este emite los callbacks a la funcion \texttt{\_input} por defecto.
+En el caso de USB HID, no hizo falta escribir código adicional para el manejo de la comunicación, ya que todos los eventos son capturados automáticamente por el motor, que emite los callbacks a la función \texttt{\_input} por defecto.
 
-Para unificar el funcionamiento y simplificar el código, tanto los mensajes obtenidos por el puerto serial (recibidos mediante la señal \texttt{input\_received}) como para los mensajes USB HID recibidos mediante el llamado a \texttt{\_input}, los dos caminos hacen el mismo llamado a la funcion \texttt{on\_input\_received}, lo que nos permite controlar de la misma manera la nave, sin importar de donde llegó el mensaje.
+Para unificar el funcionamiento y simplificar el código, tanto los mensajes obtenidos por el puerto serial (recibidos mediante la señal \texttt{input\_received}) como los mensajes USB HID (recibidos mediante el llamado a \texttt{\_input}) hacen el mismo llamado a la función \texttt{on\_input\_received}, lo que nos permite controlar la nave de la misma manera, sin importar de dónde llegó el mensaje.
 
-Ya que todos los caminos del codigo se unifican al final, y reciben eventos con la estructura nativa del motor, es posible usar otros mecanismos como \texttt{InputMap} para facilitar la implementación de la lógica de la simulación.
+Como todos los caminos del código se unifican al final y reciben eventos con la estructura nativa del motor, es posible usar otros mecanismos como \texttt{InputMap} para facilitar la implementación de la lógica de la simulación.
 
 
 \subsection{Desarrollo e integración de la experiencia interactiva}
@@ -246,9 +246,9 @@ Ya que todos los caminos del codigo se unifican al final, y reciben eventos con 
 Como entorno de simulación interactiva se nos asignó el escenario \textbf{Piloto de nave/dron}, el cual exige un control continuo de la altitud y aceleración mediante los ejes del joystick, complementado por los pulsadores para funciones de disparo, impulso y alternancia de modos. Este escenario es relevante para el estudio porque combina entradas continuas ---los dos ejes del joystick, que varían de forma constante--- con entradas discretas ---los pulsadores---. Esa mezcla obliga a que la comunicación sostenga una actualización fluida y una latencia baja, por lo que permite comparar los protocolos bajo una carga representativa del control en tiempo real. 
 
 
-La aplicación desarrollada en Godot consiste en una experiencia interactiva de temática espacial en la que el usuario controla una nave y debe interactuar con diferentes asteroides. El usuario controla la simulación con el control que maneja el Arduino y posteriormente son interpretados por el sistema de entrada de Godot mediante las acciones definidas en el \textit{Input Map}. Estas entradas permiten controlar el movimiento de la nave y ejecutar acciones como disparar, impulsar y girar, estableciendo una conexión directa entre la manipulación del controlador físico y la respuesta dentro de la experiencia digital.
+La aplicación desarrollada en Godot consiste en una experiencia interactiva de temática espacial en la que el usuario controla una nave y debe interactuar con diferentes asteroides. El usuario maneja la simulación con el controlador conectado al Arduino, y sus acciones son interpretadas por el sistema de entrada de Godot mediante las acciones definidas en el \textit{Input Map}. Estas entradas permiten controlar el movimiento de la nave y ejecutar acciones como disparar, impulsar y girar, estableciendo una conexión directa entre la manipulación del controlador físico y la respuesta dentro de la experiencia digital.
 
-En el planteamiento del ejercicio se consideraba controlar una simulación con control de altitud y aceleración, que son conceptos complejos de la física de un dron. Como el enfoque de la actividad es el desarrollo de los protocolos de comunicación, sólo se implementó una física simple donde el input del jugador se traduce directamente a la velocidad de una nave, sin conceptos de gravedad o aceleración. El escenario de simulacion implementado es una réplica sencilla del juego Asteroids.
+En el planteamiento del ejercicio se consideraba controlar una simulación con control de altitud y aceleración, que son conceptos complejos de la física de un dron. Como el enfoque de la actividad es el desarrollo de los protocolos de comunicación, solo se implementó una física simple, donde la entrada del jugador se traduce directamente en la velocidad de la nave, sin conceptos de gravedad o aceleración. El escenario de simulación implementado es una réplica sencilla del juego Asteroids.
 
 
 

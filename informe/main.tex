@@ -2,7 +2,31 @@
 \hyphenation{op-tical net-works semi-conduc-tor}
 \usepackage[spanish]{babel}
 \usepackage{graphicx}
+\usepackage{xcolor}
 \usepackage{hyperref}
+
+% Listados de código: se usan para las capturas de consola y los mensajes de ejemplo.
+\usepackage{listings}
+\definecolor{codebg}{RGB}{245,246,248}
+\definecolor{coderule}{RGB}{200,206,212}
+\lstdefinestyle{consola}{
+    basicstyle=\ttfamily\scriptsize,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    showstringspaces=false,
+    backgroundcolor=\color{codebg},
+    frame=single,
+    rulecolor=\color{coderule},
+    framesep=5pt,
+    xleftmargin=6pt,
+    xrightmargin=4pt,
+    captionpos=b,
+    abovecaptionskip=4pt,
+    aboveskip=8pt,
+    belowskip=6pt,
+}
 
 % Tipografía: reduce cajas desbordadas (overfull/underfull hbox).
 % - protrusion: permite que la puntuación cuelgue ligeramente en el margen.
@@ -126,7 +150,16 @@ Así, cada \textbf{paquete de reporte} (\textit{Input Report}) es simplemente la
 El desarrollo de el mecanismo físico-digital se implementó con un microcontrolador \textbf{Arduino Pro Micro}. La elección del Arduino Pro Micro se fundamenta en su capacidad nativa de emulación de dispositivos USB HID, lo que simplifica la transmisión de datos hacia el entorno digital.
 
 
-El control construido consta de una palanca de dos ejes (\texttt{X} e \texttt{Y}), que se comporta como dos potenciómetros independientes, y tres pulsadores (\texttt{A}, \texttt{B} y \texttt{C}). Además, la propia palanca incorpora un cuarto pulsador (\texttt{D}) que se activa al presionarla hacia abajo. Los ejes entregan valores analógicos en un rango de 0 a 1023, mientras que los pulsadores entregan valores digitales. El montaje se hizo con soldadura sobre una placa perforada para asegurar la estabilidad de las conexiones.
+El control construido consta de una palanca de dos ejes (\texttt{X} e \texttt{Y}), que se comporta como dos potenciómetros independientes, y tres pulsadores (\texttt{A}, \texttt{B} y \texttt{C}). Además, la propia palanca incorpora un cuarto pulsador (\texttt{D}) que se activa al presionarla hacia abajo. Los ejes entregan valores analógicos en un rango de 0 a 1023, mientras que los pulsadores entregan valores digitales. El montaje se hizo con soldadura sobre una placa perforada para asegurar la estabilidad de las conexiones, como se muestra en la Figura~\ref{fig:montaje}.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\columnwidth]{assets/circuito.jpg}
+    \caption{Montaje físico del controlador: joystick analógico de dos ejes y tres pulsadores soldados sobre una placa perforada.}
+    \label{fig:montaje}
+\end{figure}
+
+
 
 
 \subsection{Protocolos de Comunicación Implementados}
@@ -138,10 +171,14 @@ Para comunicar nuestros sensores físicos con Godot implementamos varios protoco
 
     En el código generamos mensajes en formato ASCII usando los identificadores A, B, C y D para los botones, y los identificadores X, Y para los ejes analógicos. Se emite un mensaje por cada boton o sensor, y mensajes siguen un formato del tipo \texttt{>VARIABLE:VALOR}, y usando un salto de línea como delimitador entre los mensajes.
     
-    Este protocolo nos permite visualizar gráficamente la variación de las entradas durante la manipulación del controlador físico usando el plugin de Teleplot en Visual Studio Code. De esta manera pudimos validar la correcta instalación del circuito antes de proceder con la implementación de los otros protocolos.
+    Este protocolo nos permite visualizar gráficamente la variación de las entradas durante la manipulación del controlador físico usando el plugin de Teleplot en Visual Studio Code, como se muestra en la Figura~\ref{fig:teleplot}. De esta manera pudimos validar la correcta instalación del circuito antes de proceder con la implementación de los otros protocolos.
 
-    < INSERTAR FOTO DE TELEPLOT >
-
+    \begin{figure}[htbp]
+        \centering
+        \includegraphics[width=\columnwidth]{assets/teleplot.png}
+        \caption{Visualización de las señales del controlador físico mediante el plugin Teleplot en Visual Studio Code.}
+        \label{fig:teleplot}
+    \end{figure}
 
     Adicionalmente, durante una de estas pruebas notamos una conección cruzada entre las señales de los botones y los potenciometros. Este fallo se mostraba como un bajón en las lecturas de los potenciometros cuando un botón estaba presionado. Esta validación nos llevo a retrabajar la placa antes de continuar con el desarrollo del proyecto.
 
@@ -152,7 +189,29 @@ Para comunicar nuestros sensores físicos con Godot implementamos varios protoco
     
     Este enfoque simplifica la integración con Godot, ya que las acciones del usuario se pueden interpretar como acciones de cualquier control de juegos.
 
+    El Listado~\ref{lst:evtest} presenta una captura de los eventos emitidos por el dispositivo, tal como los registra la herramienta \texttt{evtest} en Linux. Allí se observan los reportes de los ejes analógicos (\texttt{ABS\_X} y \texttt{ABS\_Y}) y de los pulsadores (\texttt{BTN\_EAST}), separados por los eventos de sincronización \texttt{SYN\_REPORT}:
+
+    \begin{lstlisting}[style=consola, caption={Eventos HID reportados por el Arduino Pro Micro, capturados con \texttt{evtest} en Linux.}, label={lst:evtest}]
+Event: time 1791164627.592949, -------------- SYN_REPORT ------------
+Event: time 1791164627.593950, type 3 (EV_ABS), code 0 (ABS_X), value 507
+Event: time 1791164627.593950, type 3 (EV_ABS), code 1 (ABS_Y), value 512
+Event: time 1791164627.599949, -------------- SYN_REPORT ------------
+Event: time 1791164628.926961, type 4 (EV_MSC), code 4 (MSC_SCAN), value 90002
+Event: time 1791164628.926961, type 1 (EV_KEY), code 305 (BTN_EAST), value 0
+Event: time 1791164628.926961, -------------- SYN_REPORT ------------
+Event: time 1791164629.008966, type 4 (EV_MSC), code 4 (MSC_SCAN), value 90002
+Event: time 1791164629.008966, type 1 (EV_KEY), code 305 (BTN_EAST), value 1
+    \end{lstlisting}
+
+
     \item \textbf{Representación en JSON:} Estándar de intercambio basado en texto plano estructurado mediante objetos clave-valor. Esta es una implementación rudimentaria de codificación JSON para demostrar otras opciones, aunque sentimos que no aporta mucho para las necesidades actuales. Es frágil en caso de el firmware necesitara usar el caracter de salto de linea en algun valor, ya que es el separador que usamos para los mensajes. De cualquier manera nuestros mensajes nunca usan saltos de linea como parte del mensaje, así que no hay problema por ahora.
+    
+    Captura de un mensaje emitido en formato JSON:
+    \begin{quote}
+    \shorthandoff{"}\ttfamily\raggedright
+    \{"T":79659896,\allowbreak"A":0,\allowbreak"B":0,\allowbreak"C":0,\allowbreak"D":0,\allowbreak"X":518,\allowbreak"Y":506\}
+    \end{quote}
+
 
 \end{itemize}
 
@@ -201,17 +260,6 @@ Para evaluar el desempeño de las implementaciones se estableció un procedimien
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 \section{Resultados}
 \subsection{Titulo de subsección}
 Contenido de la subsección
@@ -220,7 +268,17 @@ Contenido de la subsección
 Contenido de la subsubsección
 
 \section{Análisis y discusión}
-En este trabajo se presentó ..., se analizaron ..., y se demostró que .... Los resultados obtenidos permiten concluir que ..., lo cual abre la posibilidad de trabajos futuros relacionados con ....
+
+Los resultados obtenidos muestran que las tres implementaciones evaluadas ---Teleplot, USB HID y JSON--- cumplen con el objetivo de transportar las señales del controlador físico hacia el simulador: en todas ellas el usuario logró manejar la nave de la misma manera y la respuesta percibida fue equivalente. Las diferencias observadas en los tres criterios medidos (latencia, legibilidad y costo de procesamiento) resultaron lo suficientemente pequeñas como para no ser un factor decisivo al momento de seleccionar un protocolo. Esto es coherente con lo esperado según el marco teórico, ya que cada actualización transporta una cantidad de información muy reducida ---el estado de cuatro pulsadores y dos ejes analógicos---, muy por debajo de la capacidad tanto del puerto serial como del enlace USB.
+
+En cuanto a la legibilidad, Teleplot y JSON tienen la ventaja de ser texto plano: los mensajes pueden inspeccionarse directamente en el monitor serial y permiten depurar el circuito sin herramientas adicionales. Sin embargo, esa legibilidad tiene un costo, pues el receptor debe separar y convertir los valores (y, en el caso de JSON, deserializar la cadena), y tanto la delimitación de las tramas como la validación de integridad recaen sobre la capa de aplicación, tal como ocurre con UART \cite{tanenbaum2012}. USB HID, en cambio, describe su formato una sola vez mediante el descriptor de reporte y luego envía siempre la misma carga útil, sin encabezado, longitud ni firmas en cada mensaje, y sin necesidad de separadores ni de escape de caracteres \cite{usbhid}.
+
+En la práctica, la conveniencia de utilizar USB HID resultó superior a la flexibilidad o al rendimiento de las alternativas por puerto serial, al menos para este caso de uso específico, en el que el microcontrolador se emplea únicamente para capturar las entradas del usuario. Al presentar el dispositivo como un gamepad estándar, el sistema operativo y el motor (Godot) reconocen el controlador de forma automática, sin requerir código adicional de comunicación, ya que la interpretación de los reportes queda a cargo del stack USB del anfitrión. Esto elimina de raíz problemas propios de los protocolos de texto, como la fragmentación de los mensajes, la pérdida de sincronía cuando un mensaje llega incompleto o la ambigüedad al interpretar un separador presente dentro de los datos. Para un dispositivo dedicado a reportar unas pocas entradas, la estructura fija de HID evita trabajo y reduce puntos de fallo sin sacrificar latencia.
+
+No obstante, esta conclusión está acotada al escenario del laboratorio. Si en etapas posteriores el Arduino debiera enviar información más variada ---por ejemplo, telemetría de varios sensores con estructuras distintas, o mensajes cuyo formato cambie en tiempo de ejecución---, la flexibilidad de un protocolo serial con delimitación explícita, o de un formato como JSON, resultaría más adecuada, ya que HID obliga a declarar el formato de antemano y a rediseñar el descriptor si este cambia. Por ello, la elección de USB HID debe entenderse como la mejor opción para el caso específico evaluado, y no como una regla general.
+
+
+
 
 \section{Conclusión}
 En este trabajo se presentó ..., se analizaron ..., y se demostró que .... Los resultados obtenidos permiten concluir que ..., lo cual abre la posibilidad de trabajos futuros relacionados con ....

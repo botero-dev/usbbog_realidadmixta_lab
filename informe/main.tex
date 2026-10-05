@@ -57,7 +57,7 @@ Piloto de nave/dron }
 \maketitle
 
 \begin{abstract}
-En este trabajo se desarrolló una experiencia físico-digital que integra un control basado en un microcontrolador Arduino con una aplicación interactiva desarrollada en Godot. Las señales del control se transmiten al entorno digital por USB, donde controlan una experiencia de temática espacial en la que el usuario maneja una nave e interactúa con asteroides. Se implementaron y compararon tres alternativas de comunicación ---Teleplot, USB HID y JSON---. Los resultados obtenidos mostraron un funcionamiento estable y diferencias de rendimiento mínimas entre los tres protocolos, demostrando la viabilidad de Arduino y USB como medio de interacción para experiencias digitales desarrolladas en Godot.
+En este trabajo se desarrolló una experiencia físico-digital que integra un control basado en un microcontrolador Arduino con una aplicación interactiva desarrollada en Godot. Las señales del control se transmiten al entorno digital por USB, donde se usan para controlar una experiencia de temática espacial en la que el usuario maneja una nave e interactúa con asteroides. Se implementaron y compararon tres alternativas de comunicación ---Teleplot, USB HID y JSON---. Los resultados obtenidos mostraron un funcionamiento estable y diferencias de rendimiento mínimas entre los tres protocolos, demostrando la viabilidad de Arduino y USB como medio de interacción para experiencias digitales desarrolladas en Godot.
 \end{abstract}
 
 % Traducción del resumen al inglés (abstract)
@@ -79,7 +79,7 @@ En este laboratorio se desarrolló una experiencia físico-digital que combina u
 
 Para que esa comunicación funcionara fue necesario definir una estructura para los mensajes y validar los datos recibidos. Como la transmisión es continua, cualquier mensaje que no cumpla el formato puede descartarse sin interrumpir la interacción, pues el siguiente llegará de inmediato.
 
-El uso de USB simplifica la integración entre el control y la aplicación, pues no exige configuración adicional ni dependencias externas. Así, el trabajo permitió aplicar conceptos de adquisición de señales, transmisión de datos y comunicación entre hardware y software en una experiencia interactiva desarrollada en Godot.
+El uso de USB simplifica la integración entre el control y la aplicación, pues no exige configuración adicional ni dependencias externas. De esta manera, aplicamos conceptos de adquisición de señales, transmisión de datos y comunicación entre hardware y software en una experiencia interactiva desarrollada en Godot.
 
 
 \section{Objetivos}
@@ -157,7 +157,7 @@ Así, cada \textbf{paquete de reporte} (\textit{Input Report}) es simplemente la
 \section{Metodología y Desarrollo}
 
 \subsection{Descripción del Montaje Físico y Hardware}
-El desarrollo del mecanismo físico-digital se implementó con un microcontrolador \textbf{Arduino Pro Micro}. La elección del Arduino Pro Micro se fundamenta en su capacidad nativa de emulación de dispositivos USB HID, lo que simplifica la transmisión de datos hacia el entorno digital.
+El desarrollo del sistema físico-digital se implementó con un microcontrolador \textbf{Arduino Pro Micro}. La elección del Arduino Pro Micro se fundamenta en su capacidad nativa de emulación de dispositivos USB HID, lo que simplifica la transmisión de datos hacia el entorno digital.
 
 
 El control construido consta de una palanca de dos ejes (\texttt{X} e \texttt{Y}), que se comporta como dos potenciómetros independientes, y tres pulsadores (\texttt{A}, \texttt{B} y \texttt{C}). Además, la propia palanca incorpora un cuarto pulsador (\texttt{D}) que se activa al presionarla hacia abajo. Los ejes entregan valores analógicos en un rango de 0 a 1023, mientras que los pulsadores entregan valores digitales. El montaje se hizo con soldadura sobre una placa perforada para asegurar la estabilidad de las conexiones, como se muestra en la Figura~\ref{fig:montaje}.
@@ -304,7 +304,7 @@ La Tabla~\ref{tab:cualitativa} resume la evaluación cualitativa de los tres pro
 
 \subsection{Comparación cuantitativa}
 
-La Tabla~\ref{tab:cuantitativa} presenta las métricas cuantitativas. El tamaño de payload corresponde a los bytes útiles por muestra; el intervalo de envío es el periodo con que el firmware produce cada muestra, y de él se deriva la tasa estimada ($1/\Delta t$). La tasa medida corresponde al conteo real de muestras recibidas por el host.
+La Tabla~\ref{tab:cuantitativa} presenta las métricas cuantitativas en dos escenarios. El tamaño de payload corresponde a los bytes útiles por muestra; el intervalo entre muestras es el periodo con que el firmware ---o, en USB HID, el kernel--- reporta cada muestra, y la tasa medida es el conteo real de muestras recibidas por el host.
 
 \begin{table}[htbp]
     \centering

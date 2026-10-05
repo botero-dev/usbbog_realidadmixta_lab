@@ -24,7 +24,7 @@ distance = -297.0
 
 [node name="SerialGamepad" type="Node" parent="." unique_id=1742185797]
 script = ExtResource("1_j5px3")
-report_format = 1
+report_format = 3
 
 [node name="Controller" type="Node" parent="." unique_id=95660251]
 script = ExtResource("2_twpsu")

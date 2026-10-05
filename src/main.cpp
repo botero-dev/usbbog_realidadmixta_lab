@@ -6,10 +6,13 @@
 // FUNCIONANDO OK
 
 // Text format compatible with teleplot. each variable is written as `>VAR:VALUE\n` 
-//#define SEND_STATE_DEBUG
+// #define SEND_STATE_DEBUG
 
 // Communicates inputs as USB HID device.
 #define SEND_STATE_USB
+
+// Writes data into JSON objects. Delimits each message with `\r\n`
+//#define SEND_STATE_JSON
 
 
 // NO IMPLEMENTADOS TODAVIA
@@ -19,9 +22,6 @@
 
 // Compact serialization format. consists on a header and raw bytes of data.
 // #define SEND_STATE_BINARY
-
-// Writes data into JSON objects. Delimits each message with `\n`
-// #define SEND_STATE_JSON
 
 
 #include <Arduino.h>
@@ -218,6 +218,34 @@ void send_state_binary(State* state) {
 	}
 }
 
+// Serializa el estado como un objeto JSON por linea, delimitado por '\r\n'.
+// Ejemplo: {"T":123456,"A":0,"B":1,"C":0,"D":1,"X":520,"Y":509}
+// Todos los valores son enteros, por lo que no requieren escapado.
+void send_state_json(State* state) {
+
+	Serial.print(F("{\"T\":"));
+	Serial.print(state->timestamp);
+
+	for (uint8_t i = 0; i < NUM_DIGITAL; i++) {
+		char btn_name = 'A' + i;
+		Serial.print(F(",\""));
+		Serial.print(btn_name);
+		Serial.print(F("\":"));
+		Serial.print(state->btns[i] ? 1 : 0);
+	}
+
+	for (uint8_t i = 0; i < NUM_ANALOG; i++) {
+		char axis_name = 'X' + i;
+		Serial.print(F(",\""));
+		Serial.print(axis_name);
+		Serial.print(F("\":"));
+		Serial.print(state->axes[i]);
+	}
+
+	// Cierra el objeto y agrega CRLF como delimitador entre mensajes.
+	Serial.println('}');
+}
+
 void loop() {
 
 	// El firmware no usa datos entrantes: los descartamos.
@@ -275,7 +303,7 @@ void loop() {
 	// for testing, maybe remove in the future
 	is_dirty = true;
 
-	
+
 	if (is_dirty) {
 #ifdef SEND_STATE_BINARY
 		send_state_binary(state);
@@ -284,7 +312,7 @@ void loop() {
 #elif defined(SEND_STATE_DEBUG)
 		send_state_debug(state);
 #elif defined(SEND_STATE_JSON)
-		send_state_json();
+		send_state_json(state);
 #elif defined(SEND_STATE_USB)
 		send_state_usb(state);
 #else

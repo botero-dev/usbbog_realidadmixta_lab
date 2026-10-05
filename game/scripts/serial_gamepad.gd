@@ -112,7 +112,7 @@ const INPUT_BUTTONS := ["A", "B", "C", "D"]
 
 const INPUT_AXES := ["X", "Y"]
 const INPUT_FLIPPED := [true, true]
-const INPUT_CENTER := [520, 509]
+const INPUT_CENTER := [518, 506]
 
 
 const INPUT_MAP := {
@@ -162,14 +162,43 @@ func unpack_debug(msg: String):
 		if INPUT_FLIPPED[axis_idx]:
 			value *= -1
 		push_axis(id, value)
-	
-		
+
 
 func unpack_binary(msg: String):
 	pass
 
+
 func unpack_json(msg: String):
-	pass
+	# message should be a JSON object with keys A/B/C/D (buttons) and X/Y (axes).
+	# example: {"T":123,"A":0,"B":1,"C":0,"D":0,"X":520,"Y":509}
+	var data = JSON.parse_string(msg)
+	if typeof(data) != TYPE_DICTIONARY:
+		# malformed msg
+		return
+
+	for key in data:
+		var id = INPUT_MAP.get(key)
+		if id == null:
+			continue
+
+		var value_int := int(data[key])
+		if key in INPUT_BUTTONS:
+			push_button(id, value_int)
+		else:
+			var axis_idx: int = INPUT_AXES.find(key)
+			if axis_idx == -1:
+				continue
+			var center: int = INPUT_CENTER[axis_idx]
+			var value_offset: int = value_int - center
+			var value: float
+			if value_offset > 0:
+				value = float(value_offset) / (1023 - center)
+			else:
+				value = float(value_offset) / center
+			if INPUT_FLIPPED[axis_idx]:
+				value *= -1
+			push_axis(id, value)
+
 
 
 var last_state_btn := {}

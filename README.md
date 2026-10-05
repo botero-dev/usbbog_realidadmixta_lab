@@ -23,6 +23,7 @@ El formato de salida se elige en `src/main.cpp` descomentando uno de los
 | ------ | ----------- |
 | `SEND_STATE_TEXT`   | Texto plano por serie (`T.. A0 B1 X123 ...`) |
 | `SEND_STATE_DEBUG`  | Formato para [Teleplot](https://teleplot.fr/) |
+| `SEND_STATE_JSON`   | Objeto JSON por linea (`{"T":..,"A":0,"B":1,"X":520,"Y":509}`) |
 | `SEND_STATE_BINARY` | Paquete binario compacto |
 | `SEND_STATE_USB`    | Gamepad USB HID (ver abajo) |
 

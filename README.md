@@ -27,6 +27,20 @@ El formato de salida se elige en `src/main.cpp` descomentando uno de los
 | `SEND_STATE_BINARY` | Paquete binario compacto |
 | `SEND_STATE_USB`    | Gamepad USB HID (ver abajo) |
 
+## Tasa de envio (opcional)
+
+Por defecto el firmware envia en **cada** vuelta del `loop`, asi que la tasa de
+muestras la fija la velocidad del bucle (y puede variar entre protocolos). Para
+comparar los protocolos en igualdad de condiciones, descomenta:
+
+```c
+#define SEND_EVERY_MS 5   // una muestra cada 5 ms (200 Hz)
+```
+
+Con esto el envio se hace a tasa fija con `millis()`, igual para todos los
+protocolos, y la marca de tiempo `T` se toma en el instante del envio. Util junto
+con el arnes de medicion de `tools/` (ver `tools/README.md`).
+
 ## Modo USB HID gamepad
 
 Con `#define SEND_STATE_USB` activo, la placa (ATmega32U4) se enumera como un

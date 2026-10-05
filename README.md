@@ -64,7 +64,7 @@ Detalles:
 - El descriptor declara 16 botones (2 bytes); solo se usan los usages 1, 2, 4 y 14
   para obtener los codigos estandar `BTN_SOUTH`, `BTN_EAST`, `BTN_NORTH` y `BTN_THUMBL`.
 - Ejes de 16 bits con el valor crudo del ADC (0..1023).
-- Solo se envia un reporte cuando cambia el estado (`is_dirty`).
+- Se envia un reporte en cada vuelta del `loop` (o a tasa fija si se define `SEND_EVERY_MS`).
 - Para activarlo: comentar `#define SEND_STATE_DEBUG` y descomentar
   `#define SEND_STATE_USB`.
 
